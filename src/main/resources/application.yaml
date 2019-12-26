@@ -1,0 +1,10 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: themis
+      auto-offset-reset: earliest
+      bootstrap-servers: kafka:9092
+logging.level.org.apache.kafka: INFO
+server:
+  port: 8081
