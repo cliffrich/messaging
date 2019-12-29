@@ -14,6 +14,23 @@ public class KafkaThemisProducer {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
+    public void sendMessage(String topic, Integer partition, String key, String message) {
+        ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, partition, key, message);
+
+        future.addCallback(new ListenableFutureCallback<SendResult<String, String>>() {
+
+            @Override
+            public void onSuccess(SendResult<String, String> result) {
+                log.info("Sent message=[{}], partition={}, key={} with offset=[{}]", new Object[]{message, result.getRecordMetadata().partition(),
+                        key, result.getRecordMetadata().offset()});
+            }
+            @Override
+            public void onFailure(Throwable ex) {
+                log.info("Unable to send message=[{}] due to : {}", message, ex.getMessage());
+            }
+        });
+    }
+
     public void sendMessage(String topic, String message) {
         ListenableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, message);
 
@@ -21,11 +38,11 @@ public class KafkaThemisProducer {
 
             @Override
             public void onSuccess(SendResult<String, String> result) {
-                log.info("Sent message=[" + message + "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                log.info("Sent message=[{}] with offset=[{}]", message, result.getRecordMetadata().offset());
             }
             @Override
             public void onFailure(Throwable ex) {
-                log.info("Unable to send message=[" + message + "] due to : " + ex.getMessage());
+                log.info("Unable to send message=[{}] due to : {}", message, ex.getMessage());
             }
         });
     }

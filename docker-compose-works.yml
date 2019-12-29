@@ -13,8 +13,6 @@ services:
     image: confluentinc/cp-kafka:latest
     ports:
       - "9092"
-    #    expose:
-    #      - "9093"
     container_name: kafka
     environment:
       KAFKA_BROKER_ID: 1
