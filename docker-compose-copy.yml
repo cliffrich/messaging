@@ -1,12 +1,6 @@
 version: "3.6"
 
 services:
-  messaging:
-    image: messaging:latest
-    ports:
-      - 8081:8081
-    container_name: messaging
-
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
@@ -24,7 +18,12 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-#      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.rmi.port=1099 -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote=true"
-#      JMX_PORT: 1099
+    #      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=127.0.0.1 -Dcom.sun.management.jmxremote.rmi.port=1099 -Dcom.sun.management.jmxremote.port=1099 -Dcom.sun.management.jmxremote=true"
+    #      JMX_PORT: 1099
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+  messaging:
+    image: messaging:latest
+    ports:
+      - 8081:8081
+    container_name: messaging

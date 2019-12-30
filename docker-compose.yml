@@ -9,19 +9,34 @@ services:
     ports:
       - "2181:2181"
     container_name: zookeeper
-  kafka:
+  kafka0:
     image: confluentinc/cp-kafka:latest
     ports:
-      - "9092"
-    container_name: kafka
+      - "9092:9092"
+    container_name: kafka0
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka0:29092,EXTERNAL://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG4J_LOGGERS: kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO
+    depends_on:
+      - "zookeeper"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  kafka1:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9093:9093"
+    container_name: kafka1
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka1:29093,EXTERNAL://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - "zookeeper"
     volumes:
@@ -31,8 +46,9 @@ services:
     ports:
       - 8081:8081
     environment:
-      SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
-      SPRING_KAFKA_CONSUMER_BOOTSTRAPSERVERS: kafka:29092
+      SPRING_KAFKA_BOOTSTRAPSERVERS: kafka0:29092,kafka1:29093
+      SPRING_KAFKA_CONSUMER_BOOTSTRAPSERVERS: kafka0:29092,kafka1:29093
     container_name: messaging
     depends_on:
-      - "kafka"
+      - "kafka0"
+      - "kafka1"

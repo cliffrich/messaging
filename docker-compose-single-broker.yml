@@ -30,3 +30,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       - "zookeeper"
+  messaging:
+    image: messaging:latest
+    ports:
+      - 8081:8081
+    container_name: messaging
